@@ -1,5 +1,5 @@
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, date
 
 from pydantic import EmailStr
 from sqlalchemy import DateTime
@@ -131,3 +131,51 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=128)
+
+
+# Boss Job Details - scraped from Boss Zhipin
+class BossJobDetailsBase(SQLModel):
+    encrypt_job_id: str = Field(max_length=500)
+    job_name: str = Field(max_length=255)
+    salary_desc: str | None = Field(default=None, max_length=100)
+    city_name: str | None = Field(default=None, max_length=50)
+    area_district: str | None = Field(default=None, max_length=50)
+    business_district: str | None = Field(default=None, max_length=50)
+    job_degree: str | None = Field(default=None, max_length=50)
+    job_experience: str | None = Field(default=None, max_length=50)
+    encrypt_brand_id: str | None = Field(default=None, max_length=64)
+    brand_name: str | None = Field(default=None, max_length=255)
+    brand_logo: str | None = Field(default=None, max_length=500)
+    brand_stage_name: str | None = Field(default=None, max_length=50)
+    brand_industry: str | None = Field(default=None, max_length=100)
+    brand_scale_name: str | None = Field(default=None, max_length=100)
+    encrypt_boss_id: str | None = Field(default=None, max_length=64)
+    boss_name: str | None = Field(default=None, max_length=100)
+    boss_title: str | None = Field(default=None, max_length=100)
+    boss_avatar: str | None = Field(default=None, max_length=500)
+    boss_cert: int | None = Field(default=None)
+    skills: str | None = Field(default=None, max_length=500)
+    welfare_list: str | None = Field(default=None, max_length=500)
+    job_labels: str | None = Field(default=None, max_length=500)
+    security_id: str | None = Field(default=None, max_length=500)
+    lid: str | None = Field(default=None, max_length=100)
+    created_time: date | None = Field(default=None)
+    boss_online: bool | None = Field(default=None)
+
+
+class BossJobDetails(BossJobDetailsBase, table=True):
+    __tablename__ = "boss_job_details"
+    id: int = Field(primary_key=True, default=None, sa_column_kwargs={"autoincrement": True})
+
+
+class BossJobDetailsCreate(BossJobDetailsBase):
+    pass
+
+
+class BossJobDetailsPublic(BossJobDetailsBase):
+    id: int
+
+
+class BossJobsPublic(SQLModel):
+    data: list[BossJobDetailsPublic]
+    count: int

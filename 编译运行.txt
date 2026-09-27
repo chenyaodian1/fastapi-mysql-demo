@@ -12,9 +12,7 @@
   docker compose up -d
 
   # 查看日志
-  docker compose logs -f backend
-
-  访问地址：
+  docker compose logs -f backendc
   - 应用（前端+API）: http://localhost:8000
   - API 文档: http://localhost:8000/docs
   - Adminer 数据库管理: http://localhost:8080

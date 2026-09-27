@@ -66,3 +66,39 @@ def create_item(*, session: Session, item_in: ItemCreate, owner_id: uuid.UUID) -
     session.commit()
     session.refresh(db_item)
     return db_item
+
+
+def get_boss_jobs(
+    *,
+    session: Session,
+    skip: int = 0,
+    limit: int = 100,
+    created_time: str | None = None,
+    job_name: str | None = None,
+    city_name: str | None = None,
+) -> tuple[list, int]:
+    from datetime import date as date_type
+    from app.models import BossJobDetails
+    from sqlmodel import col, func
+
+    statement = select(BossJobDetails)
+    count_statement = select(func.count()).select_from(BossJobDetails)
+
+    if created_time:
+        # Parse date string to date object
+        created_date = date_type.fromisoformat(created_time)
+        statement = statement.where(BossJobDetails.created_time == created_date)
+        count_statement = count_statement.where(BossJobDetails.created_time == created_date)
+    if job_name:
+        statement = statement.where(BossJobDetails.job_name.ilike(f"%{job_name}%"))
+        count_statement = count_statement.where(BossJobDetails.job_name.ilike(f"%{job_name}%"))
+    if city_name:
+        statement = statement.where(BossJobDetails.city_name == city_name)
+        count_statement = count_statement.where(BossJobDetails.city_name == city_name)
+
+    count = session.exec(count_statement).one()
+
+    statement = statement.order_by(col(BossJobDetails.id).desc()).offset(skip).limit(limit)
+    jobs = session.exec(statement).all()
+
+    return list(jobs), count
