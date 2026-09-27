@@ -1,0 +1,59 @@
+> full-stack-fastapi-template-official如何编译运行
+
+● Searched for 3 patterns, read 2 files (ctrl+o to expand)
+
+● 编译运行方法
+
+  方式一：Docker Compose 一键运行（推荐）
+
+  cd full-stack-fastapi-template-official
+
+  # 启动所有服务（db + mailpit + backend + frontend）
+  docker compose up -d
+
+  # 查看日志
+  docker compose logs -f backend
+
+  访问地址：
+  - 应用（前端+API）: http://localhost:8000
+  - API 文档: http://localhost:8000/docs
+  - Adminer 数据库管理: http://localhost:8080
+  - Mailpit 邮件测试: http://localhost:8025
+
+  ---
+  方式二：本地开发模式
+
+  1. 启动 MySQL 和 Mailpit
+  docker compose up -d db mailpit
+
+  2. 安装后端依赖并初始化
+  cd backend
+  uv sync
+  uv run bash scripts/prestart.sh
+
+  3. 启动后端开发服务器
+  uv run fastapi dev
+
+  4. 启动前端（另一个终端）
+  cd frontend
+  bun install
+  bun run dev
+
+  ---
+  方式三：前后端分离本地开发
+
+  # 前端构建后由 FastAPI 服务
+  cd frontend
+  bun install
+  bun run build    # 构建到 backend/app/frontend
+
+  # 后端运行
+  cd backend
+  uv run fastapi dev
+
+  ---
+  注意事项
+
+  1. MySQL 连接：确保 .env 中 DATABASE_URL 已改为 MySQL 格式（我们已修改）
+  2. 首次启动：需要运行 scripts/prestart.sh 初始化数据库
+  3. 端口占用：本地 FastAPI 和 Docker backend 都用 8000 端口，勿同时运行
